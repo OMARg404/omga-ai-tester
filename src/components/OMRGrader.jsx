@@ -11,68 +11,145 @@ const OMRGrader = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [cameraOn, setCameraOn] = useState(false);
-  const [cameraMsg, setCameraMsg] = useState("");
+  const [cameraMsg, setCameraMsg] = useState("📷 انتظر قليلاً... جارٍ تشغيل الكاميرا");
+
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  const intervalRef = useRef(null);
 
-  // تشغيل الكاميرا
+  // 🔹 تحليل الإطار (لتحديد الإضاءة والموضع)
+  const analyzeFrame = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    const { data, width, height } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let brightness = 0, leftBright = 0, rightBright = 0, topBright = 0, bottomBright = 0;
+    const centerX = width / 2, centerY = height / 2;
+
+    for (let y = 0; y < height; y += 20) {
+      for (let x = 0; x < width; x += 20) {
+        const i = (y * width + x) * 4;
+        const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+        brightness += avg;
+        if (x < centerX) leftBright += avg; else rightBright += avg;
+        if (y < centerY) topBright += avg; else bottomBright += avg;
+      }
+    }
+
+    brightness /= (width / 20) * (height / 20);
+    const diffX = rightBright - leftBright;
+    const diffY = bottomBright - topBright;
+
+    let msg = "";
+    if (brightness < 60) msg = "💡 الإضاءة ضعيفة، قرّب من مصدر ضوء.";
+    else if (brightness > 230) msg = "⚠ الإضاءة قوية جدًا، خففها قليلًا.";
+    else if (Math.abs(diffX) > 300000)
+      msg = diffX > 0 ? "⬅ حرّك الورقة لليسار." : "➡ حرّك الورقة لليمين.";
+    else if (Math.abs(diffY) > 300000)
+      msg = diffY > 0 ? "⬆ ارفع الورقة قليلاً." : "⬇ انزل الورقة قليلاً.";
+    else msg = "✅ الوضع ممتاز! سيتم الالتقاط الآن...";
+
+    setCameraMsg(msg);
+    return brightness >= 60 && brightness <= 230 && Math.abs(diffX) < 300000 && Math.abs(diffY) < 300000;
+  };
+
+  // 🔹 تشغيل الكاميرا والتصوير التلقائي
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      if (!videoRef.current) return;
+
       videoRef.current.srcObject = stream;
+      await videoRef.current.play();
       setCameraOn(true);
-      setCameraMsg("📷 وجّه الورقة في منتصف الكاميرا بإضاءة جيدة");
+      setCameraMsg("📷 وجّه الورقة في منتصف الكاميرا بإضاءة مناسبة...");
+
+      setTimeout(() => {
+        intervalRef.current = setInterval(() => {
+          const good = analyzeFrame();
+          if (good) {
+            clearInterval(intervalRef.current);
+            triggerFlashAndCapture(stream);
+          }
+        }, 1000);
+      }, 2000);
     } catch (err) {
-      setError("لا يمكن الوصول إلى الكاميرا، رجاءً تأكد من السماح للمتصفح.");
+      console.error("Camera error:", err);
+      setError(`❌ لا يمكن الوصول إلى الكاميرا: ${err.message}`);
     }
   };
 
-  // إيقاف الكاميرا
-  const stopCamera = () => {
-    const stream = videoRef.current?.srcObject;
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-    }
-    setCameraOn(false);
+  // 🔹 فلاش + صوت + التقاط
+  const triggerFlashAndCapture = (stream) => {
+    // فلاش أبيض
+    const flash = document.createElement("div");
+    flash.style.position = "fixed";
+    flash.style.top = 0;
+    flash.style.left = 0;
+    flash.style.width = "100%";
+    flash.style.height = "100%";
+    flash.style.background = "white";
+    flash.style.opacity = "1";
+    flash.style.transition = "opacity 0.4s";
+    flash.style.zIndex = 9999;
+    document.body.appendChild(flash);
+
+    // صوت الكاميرا
+    const snapSound = new Audio("https://actions.google.com/sounds/v1/camera/camera_shutter_click.ogg");
+    snapSound.play();
+
+    setTimeout(() => {
+      flash.style.opacity = "0";
+      setTimeout(() => flash.remove(), 500);
+    }, 200);
+
+    setTimeout(() => capturePhoto(stream), 400);
   };
 
-  // التقاط الصورة من الكاميرا
-  const capturePhoto = () => {
+  // 🔹 التقاط الصورة + عرضها
+  const capturePhoto = (stream) => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    ctx.drawImage(video, 0, 0);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     canvas.toBlob((blob) => {
-      const newFile = new File([blob], "captured_exam.jpg", { type: "image/jpeg" });
-      setFile(newFile);
-      analyzeImageQuality(canvas);
-      setCameraMsg("✅ تم التقاط الصورة بنجاح، يمكنك تصحيحها الآن.");
+      const photo = new File([blob], "captured_exam.jpg", { type: "image/jpeg" });
+      setFile(photo);
+      setCameraMsg("✅ تم التقاط الصورة بنجاح!");
+
+      // عرض الصورة للمستخدم
+      const previewURL = URL.createObjectURL(blob);
+      const imgPreview = document.createElement("img");
+      imgPreview.src = previewURL;
+      imgPreview.style.width = "100%";
+      imgPreview.style.borderRadius = "10px";
+      imgPreview.style.marginTop = "10px";
+      document.querySelector(".camera-preview").appendChild(imgPreview);
+
       stopCamera();
     }, "image/jpeg");
+
+    stream.getTracks().forEach((track) => track.stop());
   };
 
-  // تحليل جودة الصورة (إضاءة وميل بسيط)
-  const analyzeImageQuality = (canvas) => {
-    const ctx = canvas.getContext("2d");
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const pixels = imageData.data;
-    let brightness = 0;
-
-    // نحسب متوسط السطوع
-    for (let i = 0; i < pixels.length; i += 4) {
-      brightness += (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
-    }
-    brightness /= pixels.length / 4;
-
-    if (brightness < 60) setCameraMsg("💡 الإضاءة ضعيفة، قرّب من مصدر ضوء");
-    else if (brightness > 230) setCameraMsg("⚠ الإضاءة قوية جدًا، قللها قليلًا");
-    else setCameraMsg("✅ الإضاءة ممتازة، الصورة مناسبة للتصحيح.");
+  // 🔹 إيقاف الكاميرا
+  const stopCamera = () => {
+    const stream = videoRef.current?.srcObject;
+    if (stream) stream.getTracks().forEach((track) => track.stop());
+    clearInterval(intervalRef.current);
+    setCameraOn(false);
   };
 
-  // رفع الصورة ومعالجتها
+  // 🔹 إرسال الصورة إلى السيرفر
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file) return setError("رجاءً اختر أو التقط صورة أولاً");
@@ -93,7 +170,6 @@ const OMRGrader = () => {
         body: formData,
       });
       const data = await response.json();
-
       if (data.error) setError(data.error);
       else setResults(data);
     } catch (err) {
@@ -103,9 +179,7 @@ const OMRGrader = () => {
     }
   };
 
-  useEffect(() => {
-    return () => stopCamera(); // تأكد من إيقاف الكاميرا عند الخروج
-  }, []);
+  useEffect(() => () => stopCamera(), []);
 
   return (
     <div className="container my-5">
@@ -115,12 +189,7 @@ const OMRGrader = () => {
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label className="form-label">📁 اختر أو التقط صورة الإجابة:</label>
-            <input
-              type="file"
-              className="form-control mb-2"
-              onChange={(e) => setFile(e.target.files[0])}
-              accept="image/*"
-            />
+            <input type="file" className="form-control mb-2" onChange={(e) => setFile(e.target.files[0])} accept="image/*" />
             {!cameraOn ? (
               <Button variant="success" onClick={startCamera}>
                 🎥 تشغيل الكاميرا
@@ -136,9 +205,6 @@ const OMRGrader = () => {
             <div className="camera-preview mb-3 text-center">
               <video ref={videoRef} autoPlay playsInline width="100%" style={{ borderRadius: "10px" }} />
               <canvas ref={canvasRef} hidden></canvas>
-              <Button className="mt-3" variant="primary" onClick={capturePhoto}>
-                📸 التقط الصورة
-              </Button>
               {cameraMsg && <Alert className="mt-3">{cameraMsg}</Alert>}
             </div>
           )}
@@ -188,15 +254,13 @@ const OMRGrader = () => {
           <Card className="mt-4 p-3 shadow-sm">
             <h3>نتيجة الاختبار: {results.score ?? "غير متوفرة"}</h3>
             <p>
-              الإجابات الصحيحة: {results.correct} | الخاطئة: {results.incorrect} | الوقت:{" "}
-              {results.timestamp}
+              الإجابات الصحيحة: {results.correct} | الخاطئة: {results.incorrect} | الوقت: {results.timestamp}
             </p>
             <ProgressBar
               now={(results.correct / results.total_questions) * 100}
               label={`${results.score}%`}
               className="mb-3"
             />
-
             {results.details && (
               <Table striped bordered hover size="sm" responsive>
                 <thead>
