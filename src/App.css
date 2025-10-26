@@ -1,5 +1,12 @@
 /************ Custom Font ************/
 
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+body,
+.chat-box,
+h2 {
+    font-family: 'Roboto', Arial, sans-serif;
+}
+
 @font-face {
     font-family: Centra;
     src: url('./assets/font/CentraNo2-Bold.ttf');
@@ -1378,4 +1385,259 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
         transform: scale(1);
         opacity: 1;
     }
+}
+
+
+/* ========== OMGA CHAT STYLING ========== */
+
+
+/* Chat container */
+
+.omga-chat-container {
+    background: #0d0d0d;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 20px;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(170, 54, 124, 0.2);
+}
+
+
+/* Messages area */
+
+.omga-chat-messages {
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+
+/* Message wrapper */
+
+.omga-msg {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-start;
+}
+
+.omga-msg.user {
+    justify-content: flex-end;
+}
+
+.omga-msg.bot {
+    justify-content: flex-start;
+}
+
+
+/* Message bubble */
+
+.omga-bubble {
+    background: linear-gradient(90deg, #1e1e1e 0%, #181818 100%);
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 15px;
+    max-width: 75%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.omga-bubble.user {
+    background: #262626;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.omga-bubble.bot {
+    background: linear-gradient(90deg, #AA367C -5.91%, #4A2FBD 111.58%);
+}
+
+
+/* Chat input area */
+
+.omga-chat-input {
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+    background: #111;
+    border-radius: 15px;
+    padding: 10px 15px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+}
+
+.omga-chat-input input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-size: 15px;
+    padding: 8px 12px;
+}
+
+.omga-chat-input button {
+    margin-left: 8px;
+    padding: 10px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #AA367C -5.91%, #4A2FBD 111.58%);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.omga-chat-input button:hover {
+    transform: scale(1.08);
+}
+
+
+/* Uploaded image preview */
+
+.omga-image-preview {
+    position: relative;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.omga-image-preview img {
+    max-width: 140px;
+    border-radius: 10px;
+    border: 2px solid #4A2FBD;
+    box-shadow: 0 0 8px rgba(74, 47, 189, 0.6);
+}
+
+.omga-remove-img {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: transparent;
+    border: none;
+    color: #ff4b4b;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+
+/* Scrollbar */
+
+.omga-chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.omga-chat-messages::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #AA367C, #4A2FBD);
+    border-radius: 10px;
+}
+
+.omga-chat-messages::-webkit-scrollbar-track {
+    background: #141414;
+}
+
+
+/* Typing animation */
+
+.typing-dots span {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin: 0 2px;
+    background-color: #fff;
+    border-radius: 50%;
+    animation: blink 1.4s infinite both;
+}
+
+.typing-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes blink {
+    0%,
+    80%,
+    100% {
+        opacity: 0.3;
+    }
+    40% {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* Chat container */
+
+.omga-chat-container {
+    background: #121212;
+    /* نفس خلفية الصفحة */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 20px;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(170, 54, 124, 0.2);
+}
+
+
+/* Message bubble */
+
+.omga-bubble {
+    background: linear-gradient(90deg, #AA367C -5.91%, #4A2FBD 111.58%);
+    /* تدريج ألوان الصفحة */
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 15px;
+    max-width: 75%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.omga-bubble.user {
+    background: #1f1f1f;
+    /* داكن شوية زي خلفية السكيلز */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+
+/* Chat input area */
+
+.omga-chat-input {
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+    background: #1a1a1a;
+    /* نفس الداكن المستخدم في البانر */
+    border-radius: 15px;
+    padding: 10px 15px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+}
+
+.omga-chat-input input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-size: 15px;
+    padding: 8px 12px;
+}
+
+.omga-chat-input button {
+    margin-left: 8px;
+    padding: 10px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #AA367C -5.91%, #4A2FBD 111.58%);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease;
 }

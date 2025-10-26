@@ -4,7 +4,7 @@ import "animate.css";
 import TrackVisibility from "react-on-screen";
 import { FaPaperPlane, FaCamera, FaImage, FaTimesCircle } from "react-icons/fa";
 
-const ChatMessage = ({ sender, text, image, isTyping }) => (
+const ChatMessage = ({ sender, text, isTyping }) => (
   <div className={`chat-message ${sender}`}>
     <div className="chat-bubble">
       {isTyping ? (
@@ -16,20 +16,11 @@ const ChatMessage = ({ sender, text, image, isTyping }) => (
       ) : (
         <>
           <strong>{sender === "user" ? "You" : "Bot"}:</strong>{" "}
-          {text && <span>{text}</span>}
-          {image && (
-            <div className="chat-image mt-2">
-              <img
-                src={image}
-                alt="uploaded"
-                style={{
-                  maxWidth: "200px",
-                  borderRadius: "10px",
-                  boxShadow: "0 0 10px rgba(0,0,0,0.2)",
-                }}
-              />
-            </div>
-          )}
+          <div
+            className="chat-text"
+            style={{ whiteSpace: "pre-line" }}
+            dangerouslySetInnerHTML={{ __html: text }}
+          />
         </>
       )}
     </div>
@@ -44,55 +35,74 @@ function ChatBot() {
   const [image, setImage] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
-  const chatBoxRef = useRef(null);
   const fileInputRef = useRef(null);
 
   const scrollToBottom = () => {
     if (!messagesEndRef.current) return;
     const chat = messagesEndRef.current.parentElement;
-    const targetScroll = messagesEndRef.current.offsetTop;
-    const startScroll = chat.scrollTop;
-    const distance = targetScroll - startScroll;
-    const duration = 800;
-    let startTime = null;
-
-    const step = (timestamp) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      chat.scrollTop = startScroll + distance * progress;
-      if (progress < 1) window.requestAnimationFrame(step);
-    };
-    window.requestAnimationFrame(step);
+    chat.scrollTop = chat.scrollHeight;
   };
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!input.trim() && !image) return;
 
-    const newMessages = [
-      ...messages,
-      { sender: "user", text: input || "", image: image || null },
-    ];
-    setMessages(newMessages);
+    const userMessage = { sender: "user", text: input || "" };
+    setMessages((prev) => [...prev, userMessage]);
     setInput("");
-    setImage(null);
     setIsTyping(true);
 
-    setTimeout(() => {
-      setIsTyping(false);
+    try {
+      let resApi;
+      let responseData;
+
+      if (image) {
+        // 📸 لو فيه صورة → نستخدم FormData
+        const formData = new FormData();
+        formData.append("question", input || "جاوب على الصورة");
+
+        const blob = await (await fetch(image)).blob();
+        const file = new File([blob], "upload.png", { type: blob.type });
+        formData.append("image", file);
+
+        resApi = await fetch("http://localhost:5000/ask", {
+          method: "POST",
+          body: formData,
+        });
+      } else {
+        // 💬 لو مفيش صورة → نستخدم JSON عادي زي Postman
+        resApi = await fetch("http://localhost:5000/ask", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ question: input }),
+        });
+      }
+
+      const contentType = resApi.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        responseData = await resApi.json();
+      } else {
+        responseData = { answer: "❌ Unexpected server response." };
+      }
+
+      const botText = responseData.answer || "🤖 No response from server.";
+
+      setMessages((prev) => [...prev, { sender: "bot", text: botText }]);
+    } catch (err) {
+      console.error(err);
       setMessages((prev) => [
         ...prev,
-        {
-          sender: "bot",
-          text: image
-            ? "🖼️ I received your image! It looks great. Want me to analyze it?"
-            : `🤖 AI Response: ${input}`,
-        },
+        { sender: "bot", text: "❌ Error contacting server." },
       ]);
-    }, 2000);
+    } finally {
+      setIsTyping(false);
+      setImage(null);
+    }
   };
 
   const handleFileUpload = (event) => {
@@ -166,18 +176,15 @@ function ChatBot() {
                     🤖
                   </p>
 
-                  <div className="chat-box" ref={chatBoxRef}>
+                  <div className="chat-box">
                     <div className="chat-messages">
                       {messages.map((msg, idx) => (
                         <ChatMessage key={idx} {...msg} />
                       ))}
-                      {isTyping && (
-                        <ChatMessage sender="bot" isTyping={true} text="" />
-                      )}
+                      {isTyping && <ChatMessage sender="bot" isTyping={true} />}
                       <div ref={messagesEndRef} />
                     </div>
 
-                    {/* ✅ معاينة الصورة قبل الإرسال */}
                     {image && (
                       <div
                         className="image-preview"
