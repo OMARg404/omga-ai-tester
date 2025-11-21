@@ -172,7 +172,7 @@ const sendMessage = async () => {
                     >
                       Omga-Solutions
                     </strong>{" "}
-                    🤖
+                    🤖 — <em>Abdelgawad-edition</em>
                   </p>
 
                   <div className="chat-box">
