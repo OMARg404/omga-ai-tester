@@ -47,63 +47,62 @@ function ChatBot() {
     scrollToBottom();
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!input.trim() && !image) return;
+const sendMessage = async () => {
+  if (!input.trim() && !image) return;
 
-    const userMessage = { sender: "user", text: input || "" };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setIsTyping(true);
+  const userMessage = { sender: "user", text: input || "" };
+  setMessages((prev) => [...prev, userMessage]);
+  setInput("");
+  setIsTyping(true);
 
-    try {
-      let resApi;
-      let responseData;
+  try {
+    let resApi;
+    let responseData;
 
-      if (image) {
-        // 📸 لو فيه صورة → نستخدم FormData
-        const formData = new FormData();
-        formData.append("question", input || "جاوب على الصورة");
+    if (image) {
+      const formData = new FormData();
+      formData.append("question", input || "جاوب على الصورة");
 
-        const blob = await (await fetch(image)).blob();
-        const file = new File([blob], "upload.png", { type: blob.type });
-        formData.append("image", file);
+      const blob = await (await fetch(image)).blob();
+      const file = new File([blob], "upload.png", { type: blob.type });
+      formData.append("image", file);
 
-        resApi = await fetch("http://localhost:5000/ask", {
-          method: "POST",
-          body: formData,
-        });
-      } else {
-        // 💬 لو مفيش صورة → نستخدم JSON عادي زي Postman
-        resApi = await fetch("http://localhost:5000/ask", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ question: input }),
-        });
-      }
-
-      const contentType = resApi.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        responseData = await resApi.json();
-      } else {
-        responseData = { answer: "❌ Unexpected server response." };
-      }
-
-      const botText = responseData.response || "🤖 No response from server.";
-
-      setMessages((prev) => [...prev, { sender: "bot", text: botText }]);
-    } catch (err) {
-      console.error(err);
-      setMessages((prev) => [
-        ...prev,
-        { sender: "bot", text: "❌ Error contacting server." },
-      ]);
-    } finally {
-      setIsTyping(false);
-      setImage(null);
+      resApi = await fetch("http://localhost:5000/ask", {
+        method: "POST",
+        body: formData,
+      });
+    } else {
+      resApi = await fetch("http://localhost:5000/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: input }),
+      });
     }
-  };
+
+    const contentType = resApi.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      responseData = await resApi.json();
+    } else {
+      responseData = { answer: "❌ Unexpected server response." };
+    }
+
+    const botText = responseData.response || "🤖 No response from server.";
+
+    setMessages((prev) => [...prev, { sender: "bot", text: botText }]);
+  } catch (err) {
+    console.error(err);
+    setMessages((prev) => [
+      ...prev,
+      { sender: "bot", text: "❌ Error contacting server." },
+    ]);
+  } finally {
+    setIsTyping(false);
+    setImage(null);
+
+    // 🟢 مهم جدًا: إعادة تعيين قيمة input file
+    if (fileInputRef.current) fileInputRef.current.value = null;
+  }
+};
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
