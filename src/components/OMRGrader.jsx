@@ -13,32 +13,30 @@ const OMRGrader = () => {
   const [loading, setLoading] = useState(false);
   const [cameraOn, setCameraOn] = useState(false);
   const [cameraMsg, setCameraMsg] = useState("");
+  const [availableCameras, setAvailableCameras] = useState([]);
+  const [selectedDeviceId, setSelectedDeviceId] = useState(null);
   const webcamRef = useRef(null);
 
-  // ✅ تشغيل الفلاش (لو مدعوم)
+  // ✅ جلب الكاميرات المتاحة
   useEffect(() => {
-    if (cameraOn && webcamRef.current) {
-      const stream = webcamRef.current.video?.srcObject;
-      if (stream) {
-        const track = stream.getVideoTracks()[0];
-        if (track.getCapabilities && track.getCapabilities().torch) {
-          track
-            .applyConstraints({ advanced: [{ torch: true }] })
-            .then(() => console.log("💡 Flash ON"))
-            .catch(() => console.warn("⚠️ الفلاش غير مدعوم في هذا الجهاز"));
-        }
-      }
-    }
-  }, [cameraOn]);
+    navigator.mediaDevices
+      .enumerateDevices()
+      .then((devices) => {
+        const videoDevices = devices.filter((d) => d.kind === "videoinput");
+        setAvailableCameras(videoDevices);
+        if (videoDevices.length > 0) setSelectedDeviceId(videoDevices[0].deviceId);
+      })
+      .catch((err) => console.error("Camera enumeration error:", err));
+  }, []);
 
-  // ✅ نصائح تلقائية أثناء الكاميرا
+  // ✅ نصائح الكاميرا
   useEffect(() => {
     if (cameraOn && webcamRef.current) {
       const tips = [
         "📄 تأكد أن الورقة ظاهرة بالكامل",
         "↔️ حرّك الكاميرا قليلاً لليمين",
         "↕️ قرّب الكاميرا أكثر",
-        "💡 الإضاءة منخفضة قليلاً، شغّل الفلاش",
+        "💡 الإضاءة منخفضة قليلاً",
         "📷 ثبّت الكاميرا وتأكد من وضوح الصورة",
       ];
       const interval = setInterval(() => {
@@ -49,33 +47,57 @@ const OMRGrader = () => {
     }
   }, [cameraOn]);
 
-  // 📸 التقاط الصورة من الكاميرا
-  const capturePhoto = () => {
+  // ✅ تحويل Base64 إلى Blob
+  const base64ToBlob = (base64Data, contentType = "image/jpeg") => {
+    const sliceSize = 512;
+    const byteCharacters = atob(base64Data.split(",")[1]);
+    const byteArrays = [];
+    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+      const slice = byteCharacters.slice(offset, offset + sliceSize);
+      const byteNumbers = new Array(slice.length);
+      for (let i = 0; i < slice.length; i++) byteNumbers[i] = slice.charCodeAt(i);
+      const byteArray = new Uint8Array(byteNumbers);
+      byteArrays.push(byteArray);
+    }
+    return new Blob(byteArrays, { type: contentType });
+  };
+
+  // 📸 التقاط الصورة
+  const capturePhoto = async () => {
     try {
+      await new Promise((r) => setTimeout(r, 1000));
       const imageSrc = webcamRef.current.getScreenshot();
-      if (!imageSrc) {
-        setError("⚠️ لم يتم التقاط الصورة، حاول مرة أخرى");
+      if (!imageSrc) return setError("⚠️ لم يتم التقاط الصورة");
+
+      const blob = base64ToBlob(imageSrc, "image/jpeg");
+      const photo = new File([blob], "captured_exam.jpg", { type: "image/jpeg" });
+
+      if (photo.size < 5000) {
+        setError("⚠️ الصورة صغيرة جدًا أو غير واضحة، حاول مجددًا");
         return;
       }
-      fetch(imageSrc)
-        .then((res) => res.blob())
-        .then((blob) => {
-          const photo = new File([blob], "captured_exam.jpg", { type: "image/jpeg" });
-          setFile(photo);
-          setCameraMsg("✅ تم التقاط الصورة بنجاح!");
-          setCameraOn(false);
-          localStorage.setItem("lastCapturedPhoto", imageSrc);
-        });
+
+      setFile(photo);
+      setCameraMsg("✅ تم التقاط الصورة بنجاح!");
+      setCameraOn(false);
+      localStorage.setItem("lastCapturedPhoto", imageSrc);
     } catch (err) {
       setError("❌ فشل التقاط الصورة من الكاميرا");
-      console.error("Camera capture error:", err);
+      console.error(err);
     }
   };
 
-  // 📤 إرسال الصورة للسيرفر وتحليلها
+  // 📤 إرسال الصورة للسيرفر مع تحقق إضافي
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file) return setError("⚠️ رجاءً اختر أو التقط صورة أولاً");
+
+    // ✅ تحقق من عدد الإجابات مقابل عدد الأسئلة
+    const answersArray = modelAnswers.split(",").map((a) => a.trim()).filter((a) => a);
+    if (numQuestions && answersArray.length !== parseInt(numQuestions)) {
+      setError(`⚠️ عدد الإجابات (${answersArray.length}) لا يطابق عدد الأسئلة (${numQuestions}).`);
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -95,30 +117,28 @@ const OMRGrader = () => {
 
       const data = await response.json();
 
-      if (data.error) {
-        setError(data.error);
-      } else {
+      if (data.error) setError(data.error);
+      else {
         setResults(data);
         setCameraMsg("✅ تم تحليل الصورة بنجاح!");
-
-        // 🧹 حذف الصورة من localStorage بعد التحليل
         localStorage.removeItem("lastCapturedPhoto");
         setFile(null);
       }
     } catch (err) {
       setError("❌ فشل الاتصال بالسيرفر، تأكد أنه يعمل على البورت 51234");
-      console.error("Server Error:", err);
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  // 🧹 مسح الصورة يدويًا (زر اختياري)
   const clearCapturedPhoto = () => {
     localStorage.removeItem("lastCapturedPhoto");
     setFile(null);
     setCameraMsg("");
   };
+
+  const answerCount = modelAnswers.split(",").filter((a) => a.trim() !== "").length;
 
   return (
     <div className="container my-5">
@@ -147,22 +167,35 @@ const OMRGrader = () => {
 
           {cameraOn && (
             <div className="text-center mb-3">
+              <label className="form-label">🎥 اختر الكاميرا:</label>
+              <select
+                className="form-select w-auto d-inline-block mb-2"
+                value={selectedDeviceId || ""}
+                onChange={(e) => setSelectedDeviceId(e.target.value)}
+              >
+                {availableCameras.map((cam, i) => (
+                  <option key={cam.deviceId} value={cam.deviceId}>
+                    {cam.label || `كاميرا ${i + 1}`}
+                  </option>
+                ))}
+              </select>
+
               <Webcam
                 audio={false}
                 ref={webcamRef}
                 screenshotFormat="image/jpeg"
                 videoConstraints={{
-                  facingMode: "environment",
+                  deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined,
                   width: 640,
                   height: 480,
                 }}
                 className="rounded shadow"
               />
+
               {cameraMsg && <Alert className="mt-3">{cameraMsg}</Alert>}
             </div>
           )}
 
-          {/* ✅ عرض آخر صورة تم التقاطها */}
           {localStorage.getItem("lastCapturedPhoto") && !cameraOn && (
             <div className="text-center mt-3">
               <h6>📷 الصورة الملتقطة:</h6>
@@ -180,8 +213,14 @@ const OMRGrader = () => {
             </div>
           )}
 
+          {/* 🧮 حقل الإجابات النموذجية + العداد */}
           <div className="mb-3 mt-4">
-            <label className="form-label">الإجابات النموذجية:</label>
+            <label className="form-label">
+              الإجابات النموذجية{" "}
+              {answerCount > 0 && (
+                <span className="text-muted">({answerCount} إجابة مدخلة)</span>
+              )}
+            </label>
             <input
               type="text"
               className="form-control"
@@ -221,45 +260,88 @@ const OMRGrader = () => {
 
         {error && <Alert variant="danger" className="mt-4">{error}</Alert>}
 
-        {results && (
-          <Card className="mt-4 p-3 shadow-sm">
-            <h3>نتيجة الاختبار: {results.score ?? "غير متوفرة"}</h3>
-            <p>
-              الإجابات الصحيحة: {results.correct} | الخاطئة: {results.incorrect} | الوقت:{" "}
-              {results.timestamp} | ⏱ {results.processing_time}
-            </p>
-            <ProgressBar
-              now={(results.correct / results.total_questions) * 100}
-              label={`${results.score}%`}
-              className="mb-3"
-            />
-            {results.details && (
-              <Table striped bordered hover size="sm" responsive>
-                <thead>
-                  <tr>
-                    <th>السؤال</th>
-                    <th>إجابتك</th>
-                    <th>الإجابة الصحيحة</th>
-                    <th>الحالة</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {results.details.map((item) => (
-                    <tr
-                      key={item.question}
-                      className={item.is_correct ? "table-success" : "table-danger"}
-                    >
-                      <td>{item.question}</td>
-                      <td>{item.student_answer}</td>
-                      <td>{item.correct_answer}</td>
-                      <td>{item.is_correct ? "✅ صحيح" : "❌ خاطئ"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            )}
-          </Card>
-        )}
+      {results && (
+  <Card className="mt-4 p-3 shadow-sm">
+    <h3 className="text-center mb-3">🎯 نتيجة الاختبار</h3>
+
+    <div className="text-center mb-3">
+      <h4>🔢 الدرجة: {results.score}%</h4>
+      <ProgressBar
+        now={results.score}
+        variant={results.score >= 90 ? "success" : results.score >= 70 ? "info" : "warning"}
+        label={`${results.score}%`}
+      />
+    </div>
+
+    <div className="d-flex flex-wrap justify-content-around text-center mb-3">
+      <div><strong>✅ الصحيحة:</strong> {results.correct}</div>
+      <div><strong>❌ الخاطئة:</strong> {results.incorrect}</div>
+      <div><strong>⏳ غير مجابة:</strong> {results.unanswered}</div>
+      <div><strong>🧮 الإجمالي:</strong> {results.total_questions}</div>
+    </div>
+
+    <hr />
+
+    <div className="mb-3 text-center">
+      <p><strong>🆔 رقم الطالب:</strong> {results.student_id}</p>
+      <p><strong>🕒 وقت التصحيح:</strong> {results.timestamp}</p>
+    </div>
+
+    {/* ✅ الأسئلة الخاطئة */}
+    {results.wrong_answers?.length > 0 && (
+      <div className="mb-3">
+        <h5>❌ الأسئلة الخاطئة:</h5>
+        <Table striped bordered hover size="sm" responsive>
+          <thead>
+            <tr>
+              <th>رقم السؤال</th>
+              <th>إجابتك</th>
+              <th>الإجابة الصحيحة</th>
+            </tr>
+          </thead>
+          <tbody>
+            {results.wrong_answers.map((item, idx) => (
+              <tr key={idx} className="table-danger">
+                <td>{item.question_number}</td>
+                <td>{item.student_answer}</td>
+                <td>{item.correct_answer}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
+    )}
+
+    <hr />
+
+    {/* ✅ تفاصيل كل الأسئلة */}
+    <h5 className="mb-3">📋 جميع الأسئلة:</h5>
+    <Table striped bordered hover size="sm" responsive>
+      <thead>
+        <tr>
+          <th>السؤال</th>
+          <th>إجابتك</th>
+          <th>الإجابة الصحيحة</th>
+          <th>الحالة</th>
+        </tr>
+      </thead>
+      <tbody>
+        {results.details.map((item) => (
+          <tr
+            key={item.question}
+            className={item.is_correct ? "table-success" : "table-danger"}
+          >
+            <td>{item.question}</td>
+            <td>{item.student_answer}</td>
+            <td>{item.correct_answer}</td>
+            <td>{item.is_correct ? "✅ صحيح" : "❌ خاطئ"}</td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
+  </Card>
+)}
+
       </Card>
     </div>
   );

@@ -90,7 +90,7 @@ function ChatBot() {
         responseData = { answer: "❌ Unexpected server response." };
       }
 
-      const botText = responseData.answer || "🤖 No response from server.";
+      const botText = responseData.response || "🤖 No response from server.";
 
       setMessages((prev) => [...prev, { sender: "bot", text: botText }]);
     } catch (err) {
