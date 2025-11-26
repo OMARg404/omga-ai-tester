@@ -1577,14 +1577,19 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
 
 /* Chat container */
 
+
+/* Chat container */
+
 .omga-chat-container {
     background: #121212;
-    /* نفس خلفية الصفحة */
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 20px;
-    padding: 20px;
+    padding: 25px;
     color: #fff;
-    box-shadow: 0 0 15px rgba(170, 54, 124, 0.2);
+    box-shadow: 0 0 20px rgba(170, 54, 124, 0.25);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
 }
 
 
@@ -1592,33 +1597,49 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
 
 .omga-bubble {
     background: linear-gradient(90deg, #AA367C -5.91%, #4A2FBD 111.58%);
-    /* تدريج ألوان الصفحة */
     color: #fff;
-    padding: 12px 16px;
-    border-radius: 15px;
+    padding: 14px 18px;
+    border-radius: 18px;
     max-width: 75%;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.5);
     animation: fadeIn 0.4s ease-in-out;
+    font-size: 15.5px;
+    word-break: break-word;
 }
 
 .omga-bubble.user {
     background: #1f1f1f;
-    /* داكن شوية زي خلفية السكيلز */
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 
-/* Chat input area */
+/* Highlight English text or code inside bubbles */
+
+.omga-bubble code,
+.omga-bubble .highlight-english {
+    color: #FFD166;
+    /* لون مميز للرموز أو الإنجليزي */
+    font-size: 17px;
+    /* تكبير شويه */
+    font-weight: 600;
+    /* أثقل شويه */
+    background: rgba(255, 209, 102, 0.1);
+    /* خلفية شفافة ناعمة */
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+
+/* Chat input */
 
 .omga-chat-input {
     display: flex;
     align-items: center;
-    margin-top: 15px;
+    margin-top: 20px;
     background: #1a1a1a;
-    /* نفس الداكن المستخدم في البانر */
-    border-radius: 15px;
-    padding: 10px 15px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+    border-radius: 20px;
+    padding: 12px 18px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .omga-chat-input input {
@@ -1626,18 +1647,74 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
     background: transparent;
     border: none;
     outline: none;
-    color: #fff;
-    font-size: 15px;
-    padding: 8px 12px;
+    color: #978f8f;
+    font-size: 16px;
+    padding: 10px 14px;
+    letter-spacing: 0.5px;
 }
 
 .omga-chat-input button {
-    margin-left: 8px;
-    padding: 10px;
-    border-radius: 10px;
+    margin-left: 10px;
+    padding: 11px 16px;
+    border-radius: 12px;
     background: linear-gradient(90deg, #AA367C -5.91%, #4A2FBD 111.58%);
     color: #fff;
     border: none;
     cursor: pointer;
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.omga-chat-input button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(170, 54, 124, 0.5);
+}
+
+
+/* Subheadings */
+
+.highlight-text {
+    color: #FFD166;
+    /* لون مميز */
+    font-size: 18px;
+    /* أكبر شويه */
+    font-weight: 600;
+    /* شويه أثقل */
+    background: rgba(255, 209, 102, 0.1);
+    /* خلفية شفافة ناعمة */
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+.eng-num {
+    color: #FFD700;
+    /* لون مميز */
+    font-weight: 600;
+    font-size: 1.05em;
+    /* شويه تكبير */
+}
+
+.subheading {
+    display: block;
+    margin-top: 18px;
+    margin-bottom: 12px;
+    font-size: 22px;
+    /* أكبر حجم */
+    font-weight: 800;
+    /* هاي لايت */
+    color: #FFD166;
+    /* لون بارز على الخلفية الداكنة */
+    border-bottom: 2px solid #AA367C;
+    padding-bottom: 6px;
+}
+
+
+/* Lists */
+
+ul {
+    padding-left: 22px;
+    margin: 8px 0;
+}
+
+li {
+    margin-bottom: 6px;
 }

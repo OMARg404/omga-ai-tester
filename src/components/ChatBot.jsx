@@ -15,21 +15,48 @@ const ChatMessage = ({ sender, text, isTyping }) => (
         </div>
       ) : (
         <>
-          <strong>{sender === "user" ? "You" : "Bot"}:</strong>{" "}
+          <strong>{sender === "user" ? "Student" : "Omga AI"}:</strong>{" "}
           <div
             className="chat-text"
-            style={{ whiteSpace: "pre-line" }}
-            dangerouslySetInnerHTML={{ __html: text }}
+            style={{ whiteSpace: "pre-line",
+  direction: "rtl",
+  textAlign: "right",
+  unicodeBidi: "plaintext",
+  fontFamily: "'Cairo', sans-serif",}}
+            dangerouslySetInnerHTML={{ __html: formatMessage(text) }}
           />
         </>
       )}
     </div>
   </div>
 );
+const formatMessage = (text) => {
+  let formatted = text;
+
+  // ** عنوان فرعي **
+  formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<span class="subheading">$1</span>');
+
+  // * نص مائل *
+  formatted = formatted.replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+  // الخلاصة 💡
+  formatted = formatted.replace(/💡\s*(.*)/g, '<div class="highlight">💡 $1</div>');
+
+  // المراجع 📚
+  formatted = formatted.replace(/📚\s*(.*)/g, '<div class="references">📚 $1</div>');
+
+  
+  // newline -> <br>
+  formatted = formatted.replace(/\n/g, "<br>");
+
+  return formatted;
+};
+
+
 
 function ChatBot() {
   const [messages, setMessages] = useState([
-    { sender: "bot", text: "👋 Hello! I'm Omga-Chat 🤖 — Ask me anything!" },
+    { sender: "Omga AI", text: "👋 Hello! I'm Omga-Chat 🤖 — Ask me anything!" },
   ]);
   const [input, setInput] = useState("");
   const [image, setImage] = useState(null);
@@ -88,12 +115,12 @@ const sendMessage = async () => {
 
     const botText = responseData.response || "🤖 No response from server.";
 
-    setMessages((prev) => [...prev, { sender: "bot", text: botText }]);
+    setMessages((prev) => [...prev, { sender: "Omga AI", text: botText }]);
   } catch (err) {
     console.error(err);
     setMessages((prev) => [
       ...prev,
-      { sender: "bot", text: "❌ Error contacting server." },
+      { sender: "Omga AI", text: "❌ Error contacting server." },
     ]);
   } finally {
     setIsTyping(false);
@@ -180,7 +207,7 @@ const sendMessage = async () => {
                       {messages.map((msg, idx) => (
                         <ChatMessage key={idx} {...msg} />
                       ))}
-                      {isTyping && <ChatMessage sender="bot" isTyping={true} />}
+                      {isTyping && <ChatMessage sender="Omga AI" isTyping={true} />}
                       <div ref={messagesEndRef} />
                     </div>
 
