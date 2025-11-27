@@ -56,7 +56,7 @@ const formatMessage = (text) => {
 
 function ChatBot() {
   const [messages, setMessages] = useState([
-    { sender: "Omga AI", text: "👋 Hello! I'm Omga-Chat 🤖 — Ask me anything!" },
+    { sender: "Omga AI", text: "👋 Hello! I'm **Omga-Chat 🤖 — Abdelgawad Edition**  Ask me anything about Chemistry! ⚗️🔥" },
   ]);
   const [input, setInput] = useState("");
   const [image, setImage] = useState(null);
