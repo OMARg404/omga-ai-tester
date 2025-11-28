@@ -94,12 +94,12 @@ const sendMessage = async () => {
       const file = new File([blob], "upload.png", { type: blob.type });
       formData.append("image", file);
 
-      resApi = await fetch("http://localhost:5000/ask", {
+      resApi = await fetch("http://localhost:3000/ask", {
         method: "POST",
         body: formData,
       });
     } else {
-      resApi = await fetch("http://localhost:5000/ask", {
+      resApi = await fetch("http://localhost:3000/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: input }),
