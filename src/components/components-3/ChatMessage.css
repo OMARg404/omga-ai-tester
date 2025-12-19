@@ -170,16 +170,27 @@
 
 .chat-intro-text {
     background: linear-gradient(135deg, #6a1b9a, #9c27b0);
-    /* تدرج بنفسجي متناسق */
     color: #fff;
-    font-weight: 800;
-    font-size: 1.5rem;
+    font-weight: 400;
+    font-size: 0.9rem;
+    /* أصغر شوية */
     text-align: center;
-    padding: 18px 25px;
-    border-radius: 25px;
-    margin: 20px auto;
-    max-width: 85%;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-    line-height: 1.4;
-    transition: 0.3s;
+    padding: 12px 18px;
+    /* أقل */
+    border-radius: 18px;
+    /* أنعم */
+    margin: 14px auto;
+    max-width: 75%;
+    /* أضيق */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    line-height: 1.35;
+    transition: all 0.25s ease;
+}
+
+@media (max-width: 576px) {
+    .chat-intro-text {
+        font-size: 0.85rem;
+        padding: 10px 14px;
+        max-width: 85%;
+    }
 }
