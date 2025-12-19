@@ -194,3 +194,144 @@
         max-width: 85%;
     }
 }
+
+.chat-actions {
+    display: inline-flex;
+    gap: 6px;
+    margin-left: 8px;
+}
+
+.chat-btn-copy,
+.chat-btn-edit {
+    background: #2a3a4d;
+    border: none;
+    color: #fff;
+    padding: 4px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: 0.2s;
+}
+
+.chat-btn-copy:hover,
+.chat-btn-edit:hover {
+    background: #3b4e66;
+}
+
+
+/* ChatMessage.css */
+
+.chat-bubble {
+    position: relative;
+    padding: 10px 15px;
+    border-radius: 12px;
+    background: #f1f1f1;
+    margin: 8px 0;
+}
+
+
+/* أزرار النسخ والتعديل مخفية بشكل افتراضي */
+
+.chat-actions {
+    display: none;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    gap: 5px;
+}
+
+.chat-bubble:hover .chat-actions {
+    display: flex;
+}
+
+.chat-btn-copy,
+.chat-btn-edit {
+    background: #2a3a4d;
+    border: none;
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.chat-btn-copy:hover,
+.chat-btn-edit:hover {
+    background: #1e2a3b;
+}
+
+.chat-bubble {
+    position: relative;
+    padding: 10px 15px;
+    border-radius: 12px;
+    background: #f1f1f1;
+    margin: 8px 0;
+}
+
+
+/* أزرار النسخ والتعديل مخفية بشكل افتراضي */
+
+.chat-actions {
+    display: flex;
+    /* بدلاً من none */
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    gap: 5px;
+    z-index: 10;
+}
+
+.chat-bubble:hover .chat-actions {
+    display: flex;
+}
+
+.chat-btn-copy,
+.chat-btn-edit {
+    background: #2a3a4d;
+    border: none;
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.chat-btn-copy:hover,
+.chat-btn-edit:hover {
+    background: #1e2a3b;
+}
+
+.chat-actions {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.chat-btn-copy,
+.chat-btn-edit,
+.chat-btn-edit-save,
+.chat-btn-edit-cancel {
+    background: #2a3a4d;
+    border: none;
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.chat-btn-copy:hover,
+.chat-btn-edit:hover,
+.chat-btn-edit-save:hover,
+.chat-btn-edit-cancel:hover {
+    background: #1e2a3b;
+}
+
+.chat-edit-container {
+    margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}

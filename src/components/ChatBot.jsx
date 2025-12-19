@@ -64,6 +64,7 @@ function ChatBot() {
     setIsTyping(true);
 
     try {
+      let res, data;
       if (image) {
         const formData = new FormData();
         formData.append("question", input || "جاوب على الصورة");
@@ -74,29 +75,21 @@ function ChatBot() {
           new File([blob], "upload.png", { type: blob.type })
         );
 
-        const res = await fetch("http://localhost:5000/ask", {
-          method: "POST",
-          body: formData,
-        });
-
-        const data = await res.json();
-        setMessages((prev) => [
-          ...prev,
-          { sender: "Omga AI", text: data.response },
-        ]);
+        res = await fetch("https://aiservice.magacademy.co/ask", { method: "POST", body: formData });
+        data = await res.json();
       } else {
-        const res = await fetch("http://localhost:5000/ask", {
+        res = await fetch("https://aiservice.magacademy.co/ask", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ question: input }),
         });
-
-        const data = await res.json();
-        setMessages((prev) => [
-          ...prev,
-          { sender: "Omga AI", text: data.response },
-        ]);
+        data = await res.json();
       }
+
+      setMessages((prev) => [
+        ...prev,
+        { sender: "Omga AI", text: data.response },
+      ]);
     } catch (err) {
       console.error(err);
       setMessages((prev) => [
@@ -110,6 +103,15 @@ function ChatBot() {
     }
   };
 
+  /* ================= Edit Message ================= */
+  const handleEditMessage = (index, newText) => {
+    setMessages((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], text: newText };
+      return updated;
+    });
+  };
+
   return (
     <section id="chat">
       <Container>
@@ -120,7 +122,11 @@ function ChatBot() {
                 <div className="chat-box">
                   <div className="chat-messages">
                     {messages.map((m, i) => (
-                      <ChatMessage key={i} {...m} />
+                      <ChatMessage
+                        key={i}
+                        {...m}
+                        onEdit={(newText) => handleEditMessage(i, newText)}
+                      />
                     ))}
                     {isTyping && <ChatMessage sender="Omga AI" isTyping />}
                     <div ref={messagesEndRef} />
