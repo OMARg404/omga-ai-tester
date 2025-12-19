@@ -1,0 +1,31 @@
+.image-preview-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.image-preview-img {
+    max-width: 150px;
+    border-radius: 10px;
+    border: 2px solid #4a2fbd;
+    box-shadow: 0 0 8px rgba(74, 47, 189, 0.6);
+}
+
+.image-preview-remove-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: rgba(0, 0, 0, 0.6);
+    border: none;
+    color: red;
+    font-size: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.2s;
+    padding: 2px;
+}
+
+.image-preview-remove-btn:hover {
+    background: rgba(0, 0, 0, 0.9);
+}

@@ -1024,7 +1024,7 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
     border-radius: 15px;
     max-width: 70%;
     color: #fff;
-    background: linear-gradient(5.91deg, #AA367C 0%, #4A2FBD 100%);
+    background: linear-gradient(135deg, #0d1b2a, #1b263b);
 }
 
 .chat-input {
@@ -1740,4 +1740,100 @@ ul {
 
 li {
     margin-bottom: 6px;
+}
+
+.info {
+    background: #eef6ff;
+    border-left: 4px solid #4a90e2;
+    padding: 10px;
+    margin: 8px 0;
+}
+
+.warning {
+    background: #fff4e5;
+    border-left: 4px solid #f5a623;
+    padding: 10px;
+}
+
+.success {
+    background: #e7f9ed;
+    border-left: 4px solid #2ecc71;
+    padding: 10px;
+}
+
+pre {
+    background: #0f172a;
+    color: #e5e7eb;
+    padding: 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.subheading {
+    display: block;
+    font-weight: 700;
+    margin: 12px 0 6px;
+}
+
+.highlight,
+.references {
+    background: #f8f9ff;
+    border-left: 4px solid #4a2fbd;
+    padding: 12px;
+    margin: 16px 0;
+}
+
+p {
+    margin: 8px 0;
+    line-height: 1.8;
+}
+
+.colored-heading {
+    color: #4a2fbd;
+    font-weight: 800;
+    margin: 18px 0 8px;
+}
+
+.subheading {
+    display: inline-block;
+    font-weight: 700;
+    color: #aa367c;
+}
+
+.inline-highlight {
+    background: #fff3cd;
+    color: #7a4a00;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.highlight {
+    background: #eef1ff;
+    border-left: 5px solid #4a2fbd;
+    padding: 12px;
+    margin: 16px 0;
+}
+
+.references {
+    background: #f7f7f7;
+    border-left: 5px solid #999;
+    padding: 12px;
+    margin: 16px 0;
+}
+
+p {
+    line-height: 1.9;
+    margin: 8px 0;
+}
+
+.chat-bubble {
+    line-height: 1.9;
+    margin: 8px 0;
 }
