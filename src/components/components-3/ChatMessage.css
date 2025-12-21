@@ -187,30 +187,18 @@
     transition: all 0.25s ease;
 }
 
-@media (max-width: 576px) {
-    .chat-intro-text {
-        font-size: 0.85rem;
-        padding: 10px 14px;
-        max-width: 85%;
-    }
-}
-
-.chat-actions {
-    display: inline-flex;
-    gap: 6px;
-    margin-left: 8px;
-}
-
 .chat-btn-copy,
-.chat-btn-edit {
+.chat-btn-edit,
+.chat-btn-edit-save,
+.chat-btn-edit-cancel {
     background: #2a3a4d;
     border: none;
     color: #fff;
-    padding: 4px 6px;
-    border-radius: 4px;
+    padding: 5px 8px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 0.85rem;
-    transition: 0.2s;
+    font-size: 14px;
+    transition: background 0.2s;
 }
 
 .chat-btn-copy:hover,
@@ -242,31 +230,39 @@
 
 .chat-bubble:hover .chat-actions {
     display: flex;
+    opacity: 1;
 }
 
 .chat-btn-copy,
-.chat-btn-edit {
+.chat-btn-edit,
+.chat-btn-edit-save,
+.chat-btn-edit-cancel {
     background: #2a3a4d;
     border: none;
     color: #fff;
     padding: 5px 8px;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
-    transition: 0.2s;
+    transition: background 0.2s;
 }
 
 .chat-btn-copy:hover,
-.chat-btn-edit:hover {
+.chat-btn-edit:hover,
+.chat-btn-edit-save:hover,
+.chat-btn-edit-cancel:hover {
     background: #1e2a3b;
 }
 
 .chat-bubble {
     position: relative;
-    padding: 10px 15px;
+    padding: 12px 16px;
     border-radius: 12px;
     background: #f1f1f1;
     margin: 8px 0;
+    display: flex;
+    flex-direction: column;
+    /* مهم علشان الأزرار تكون تحت النص */
 }
 
 

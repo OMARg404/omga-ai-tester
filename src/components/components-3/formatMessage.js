@@ -22,17 +22,56 @@ const formatMessage = (text = "") => {
     formatted = formatted.replace(/```([\s\S]+?)```/g, '<pre class="chat-code">$1</pre>');
 
     // ================= نصائح / اقتباسات =================
-    formatted = formatted.replace(/💡\s*(.+)/g, '<blockquote class="chat-tip">💡 $1</blockquote>');
+    formatted = formatted.replace(/💡\s*(.+)/g, '<blockquote class="chat-tip">$1</blockquote>');
 
+    // ================= الأسهم =================
     formatted = formatted.replace(/(→|←)/g, '<span class="chat-arrow">$1</span>');
 
     // ================= إزالة أسطر فارغة متعددة =================
     formatted = formatted.replace(/\n{2,}/g, '\n');
 
-    // ================= الفقرات =================
+    // ================= فقرات المراجع 📚 =================
+    formatted = formatted.replace(
+        /(^|\n)(\s*)(📚\s*المراجع \(الكتب\):.*?)(?=\n|$)/g,
+        (match, p1, p2, p3) => {
+            return `${p1}<p class="chat-paragraph chat-reference">${p3.trim()}</p>`;
+        }
+    );
+
+    // ================= فقرات صور / أجزاء كتب 📖 =================
+    formatted = formatted.replace(
+        /(^|\n)(\s*)(📖.*?)(?=\n|$)/g,
+        (match, p1, p2, p3) => {
+            return `${p1}<p class="chat-paragraph chat-book">${p3.trim()}</p>`;
+        }
+    );
+
+    // ================= الفقرات العامة =================
     formatted = formatted.replace(
         /(^|\n)(?!<div|<h[1-3]|<ul|<li|<pre|<code|<blockquote)([^<\n].+?)(?=\n|$)/g,
-        '$1<p class="chat-paragraph">$2</p>'
+        (match, p1, p2) => {
+            let className = 'chat-paragraph';
+
+            // هزار 🎭
+            if (/^🎭/.test(p2)) {
+                className += ' chat-funny';
+                p2 = p2.replace(/^🎭\s*/, '');
+            }
+
+            // علمي 🔹
+            else if (/^🔹/.test(p2)) {
+                className += ' chat-scientific';
+                p2 = p2.replace(/^🔹\s*/, '');
+            }
+
+            // نصيحة 💡
+            else if (/^💡/.test(p2)) {
+                className += ' chat-tip-paragraph';
+                p2 = p2.replace(/^💡\s*/, '');
+            }
+
+            return `${p1}<p class="${className}">${p2}</p>`;
+        }
     );
 
     // ================= تنظيف فقرات حول العناوين =================
