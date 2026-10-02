@@ -1,0 +1,333 @@
+.chat-message {
+    display: flex;
+    margin: 10px 0;
+}
+
+.chat-message.user {
+    justify-content: flex-end;
+}
+
+.chat-message.Omga\ AI {
+    justify-content: flex-start;
+}
+
+.chat-bubble {
+    max-width: 70%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #0d1b2a, #1b263b);
+    color: #f5f5f5;
+    position: relative;
+    word-wrap: break-word;
+}
+
+.chat-message.user .chat-bubble {
+    border-bottom-right-radius: 0;
+}
+
+.chat-message.Omga\ AI .chat-bubble {
+    border-bottom-left-radius: 0;
+}
+
+.chat-text {
+    white-space: pre-line;
+    direction: rtl;
+    text-align: right;
+    font-family: 'Cairo', sans-serif;
+}
+
+.typing-dots {
+    display: flex;
+    gap: 4px;
+}
+
+.typing-dots span {
+    width: 6px;
+    height: 6px;
+    background: #fff;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+
+.typing-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes blink {
+    0%,
+    80%,
+    100% {
+        opacity: 0;
+    }
+    40% {
+        opacity: 1;
+    }
+}
+
+.chat-image-container {
+    margin: 8px 0;
+    text-align: center;
+}
+
+.chat-image {
+    max-width: 200px;
+    border-radius: 10px;
+    border: 2px solid #4A2FBD;
+    box-shadow: 0 0 8px rgba(74, 47, 189, 0.6);
+}
+
+.chat-image-container {
+    margin: 5px 0;
+    text-align: center;
+}
+
+.chat-image {
+    max-width: 200px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.intro-message {
+    display: flex;
+    justify-content: center;
+    /* في منتصف الشاشة أفقيًا */
+    margin: 20px 0;
+}
+
+.intro-message .chat-bubble {
+    background-color: #ffd700;
+    /* أصفر بارز */
+    color: #000;
+    font-weight: bold;
+    font-size: 1.2rem;
+    padding: 15px 25px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 80%;
+}
+
+
+/* فقاعات الشات العادية */
+
+.chat-message {
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-message.user {
+    align-items: flex-end;
+}
+
+.chat-message.OmgaAI,
+.chat-message.OmgaAI {
+    align-items: flex-start;
+}
+
+.chat-bubble {
+    max-width: 70%;
+    padding: 10px 15px;
+    border-radius: 15px;
+    background-color: #f1f0f0;
+    position: relative;
+}
+
+
+/* نص الشات العادي */
+
+.chat-text {
+    white-space: pre-line;
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px;
+}
+
+
+/* الصور */
+
+.chat-image-container {
+    margin: 5px 0;
+}
+
+.chat-image {
+    max-width: 100%;
+    border-radius: 10px;
+}
+
+
+/* ---------------- Intro Message Styles ---------------- */
+
+.chat-intro-message {
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* ================= رسالة البداية ================= */
+
+.chat-intro-text {
+    background: linear-gradient(135deg, #6a1b9a, #9c27b0);
+    color: #fff;
+    font-weight: 400;
+    font-size: 0.9rem;
+    /* أصغر شوية */
+    text-align: center;
+    padding: 12px 18px;
+    /* أقل */
+    border-radius: 18px;
+    /* أنعم */
+    margin: 14px auto;
+    max-width: 75%;
+    /* أضيق */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    line-height: 1.35;
+    transition: all 0.25s ease;
+}
+
+.chat-btn-copy,
+.chat-btn-edit,
+.chat-btn-edit-save,
+.chat-btn-edit-cancel {
+    background: #2a3a4d;
+    border: none;
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.chat-btn-copy:hover,
+.chat-btn-edit:hover {
+    background: #3b4e66;
+}
+
+
+/* ChatMessage.css */
+
+.chat-bubble {
+    position: relative;
+    padding: 10px 15px;
+    border-radius: 12px;
+    background: #f1f1f1;
+    margin: 8px 0;
+}
+
+
+/* أزرار النسخ والتعديل مخفية بشكل افتراضي */
+
+.chat-actions {
+    display: none;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    gap: 5px;
+}
+
+.chat-bubble:hover .chat-actions {
+    display: flex;
+    opacity: 1;
+}
+
+.chat-btn-copy,
+.chat-btn-edit,
+.chat-btn-edit-save,
+.chat-btn-edit-cancel {
+    background: #2a3a4d;
+    border: none;
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.chat-btn-copy:hover,
+.chat-btn-edit:hover,
+.chat-btn-edit-save:hover,
+.chat-btn-edit-cancel:hover {
+    background: #1e2a3b;
+}
+
+.chat-bubble {
+    position: relative;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: #f1f1f1;
+    margin: 8px 0;
+    display: flex;
+    flex-direction: column;
+    /* مهم علشان الأزرار تكون تحت النص */
+}
+
+
+/* أزرار النسخ والتعديل مخفية بشكل افتراضي */
+
+.chat-actions {
+    display: flex;
+    /* بدلاً من none */
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    gap: 5px;
+    z-index: 10;
+}
+
+.chat-bubble:hover .chat-actions {
+    display: flex;
+}
+
+.chat-btn-copy,
+.chat-btn-edit {
+    background: #2a3a4d;
+    border: none;
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.chat-btn-copy:hover,
+.chat-btn-edit:hover {
+    background: #1e2a3b;
+}
+
+.chat-actions {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.chat-btn-copy,
+.chat-btn-edit,
+.chat-btn-edit-save,
+.chat-btn-edit-cancel {
+    background: #2a3a4d;
+    border: none;
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.chat-btn-copy:hover,
+.chat-btn-edit:hover,
+.chat-btn-edit-save:hover,
+.chat-btn-edit-cancel:hover {
+    background: #1e2a3b;
+}
+
+.chat-edit-container {
+    margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
